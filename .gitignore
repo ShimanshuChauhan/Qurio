@@ -4,4 +4,4 @@ backend/node_modules/
 
 # Environment variables
 frontend/.env
-backend/.config.env
+backend/config.env
