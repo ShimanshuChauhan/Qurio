@@ -21,3 +21,6 @@ const questionSchema = new mongoose.Schema({
     ref: "Quiz",
   },
 }, { timestamps: true });
+
+const Question = mongoose.model("Question", questionSchema);
+export default Question;
