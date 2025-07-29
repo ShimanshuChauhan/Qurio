@@ -16,9 +16,10 @@ const questionSchema = new mongoose.Schema({
       },
     },
   ],
-  quiz: {
+  quizId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Quiz",
+    required: [true, "question must belong to a quiz"]
   },
 }, { timestamps: true });
 
