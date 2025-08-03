@@ -35,27 +35,19 @@ export const getAllQuizes = catchAsync(async (req, res, next) => {
 });
 
 export const updateQuiz = catchAsync(async (req, res, next) => {
+  const { title, description } = req.body;
   const quizId = req.params.id;
 
   const quiz = await Quiz.findById(quizId);
+
   if (!quiz) return next(new AppError("No quiz found with that ID", 404));
+  if (!title && !description) return next(new AppError("Please provide atleast one field to update [ title or description ]", 404));
 
-  const allowedFields = ["title", "description"];
-  const updateData = {};
+  const updatedData = {}
+  if (title) updatedData.title = title;
+  if (description) updatedData.description = description;
 
-  for (const field of allowedFields) {
-    if (req.body[field] !== undefined) {
-      updateData[field] = req.body[field];
-    }
-  }
-
-  console.log(updateData);
-
-  if (Object.keys(updateData).length === 0) {
-    return next(new AppError("Please provide atleast one valid field to update (title or description)", 400));
-  }
-
-  const updatedQuiz = await Quiz.findByIdAndUpdate(quizId, updateData, {
+  const updatedQuiz = await Quiz.findByIdAndUpdate(quizId, updatedData, {
     new: true,
     runValidators: true,
   });
