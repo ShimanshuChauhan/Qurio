@@ -1,12 +1,25 @@
 import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import GlareHover from "@/blocks/Animations/GlareHover/GlareHover";
+import { useEffect, useState } from "react";
+import { QuizLoading } from "@/components/QuizLoading";
 
 export default function QuizLayout() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); // Simulate loading for 2 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="flex-1 p-2 overflow-hidden">
       <ScrollArea className="h-full w-full">
-        <div className="grid p-4 gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto">
+        {isLoading && <QuizLoading />}
+        {!isLoading && <div className="grid p-4 gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto">
           {Array.from({ length: 200 }).map((_, i) => (
             <div
               key={i}
@@ -32,7 +45,7 @@ export default function QuizLayout() {
               </GlareHover>
             </div>
           ))}
-        </div>
+        </div>}
       </ScrollArea>
     </div>
   );
