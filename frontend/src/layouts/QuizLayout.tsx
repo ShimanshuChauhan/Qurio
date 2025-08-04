@@ -3,16 +3,40 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import GlareHover from "@/blocks/Animations/GlareHover/GlareHover";
 import { useEffect, useState } from "react";
 import { QuizLoading } from "@/components/QuizLoading";
+import axios from "axios";
+
+interface Quiz {
+  id: string;
+  title: string;
+  description: string;
+}
 
 export default function QuizLayout() {
   const [isLoading, setIsLoading] = useState(false);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+
+  const fetchQuizzes = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('http://localhost:3000/api/v1/quiz');
+      const quizzes = response.data.data.quizzes;
+      const sanitizedQuizzes = quizzes.map(q => (
+        {
+          id: q._id,
+          title: q.title,
+          description: q.description
+        }
+      ));
+      setQuizzes(sanitizedQuizzes);
+    } catch (error) {
+      console.error("Error fetching quizzes:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000); // Simulate loading for 2 seconds
-    return () => clearTimeout(timer);
+    fetchQuizzes();
   }, []);
 
   return (
@@ -20,7 +44,7 @@ export default function QuizLayout() {
       <ScrollArea className="h-full w-full">
         {isLoading && <QuizLoading />}
         {!isLoading && <div className="grid p-4 gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto">
-          {Array.from({ length: 200 }).map((_, i) => (
+          {quizzes.map((q, i) => (
             <div
               key={i}
               className="relative w-full min-h-56 sm:min-h-60 md:min-h-64 lg:min-h-72 xl:min-h-80 transform transition duration-200 ease-in hover:scale-[1.03]"
@@ -32,14 +56,14 @@ export default function QuizLayout() {
                 glareSize={300}
                 transitionDuration={800}
                 playOnce={true}
-                className="!w-full !h-full !bg-[#2a2e18]/10 backdrop-blur-md "
+                className="!w-full !h-full !bg-[#2a2e18]/10 backdrop-blur-[5px]"
               >
                 <Card className="w-full h-full bg-white/10 border border-white/20 text-white">
                   <CardHeader className="text-lg font-semibold">
-                    Quiz Name {i + 1}
+                    {q.title} {i + 1}
                   </CardHeader>
                   <CardDescription className="px-6 pb-4 text-white/80">
-                    This is a short description of the quiz. Improve your skills and test your knowledge!
+                    {q.description}
                   </CardDescription>
                 </Card>
               </GlareHover>

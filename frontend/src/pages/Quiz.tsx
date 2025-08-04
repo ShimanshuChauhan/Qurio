@@ -100,7 +100,7 @@ export default function Quiz() {
         {currentQuestion.question}
       </p>
 
-      <ul className="mt-6 w-full max-w-lg max-w-xl space-y-4">
+      <ul className="mt-6 w-full max-w-xl space-y-4">
         {currentQuestion.options.map((option, index) => (
           <QuizOption
             key={index}

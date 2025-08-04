@@ -1,5 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
+import cors from 'cors';
 
 import AppError from './utils/appError.js';
 import globalErrorHandler from './controllers/errorController.js';
@@ -10,6 +11,13 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+const corsOptions = {
+  origin: "http://localhost:5173",
+  optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions));
 
 if (process.env.NODE_ENV === 'development') {
   // Logging middleware for development environment
