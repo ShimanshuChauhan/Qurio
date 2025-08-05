@@ -13,6 +13,7 @@ interface Quiz {
 
 export default function QuizLayout() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
   const fetchQuizzes = async () => {
@@ -29,7 +30,7 @@ export default function QuizLayout() {
       ));
       setQuizzes(sanitizedQuizzes);
     } catch (error) {
-      console.error("Error fetching quizzes:", error);
+      setError(true);
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +44,8 @@ export default function QuizLayout() {
     <div className="flex-1 p-2 overflow-hidden">
       <ScrollArea className="h-full w-full">
         {isLoading && <QuizLoading />}
-        {!isLoading && <div className="grid p-4 gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto">
+        {!isLoading && error && <div className="h-screen w-screen flex justify-center items-center text-white font-bold text-4xl"><p>Something Went Wrong</p></div>}
+        {!isLoading && !error && <div className="grid p-4 gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto">
           {quizzes.map((q, i) => (
             <div
               key={i}
