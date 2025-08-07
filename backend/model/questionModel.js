@@ -23,5 +23,7 @@ const questionSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+questionSchema.index({ quizId: 1 });
+
 const Question = mongoose.model("Question", questionSchema);
 export default Question;

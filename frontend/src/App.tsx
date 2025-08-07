@@ -3,17 +3,21 @@ import MainLayout from "./layouts/MainLayout"
 import PageNotFound from "./components/PageNotFound"
 import Home from "./pages/Home"
 import Quiz from "./pages/Quiz"
+import { Toaster } from "./components/ui/sonner"
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="about" element={<div>About</div>} />
-        <Route path="quiz" element={<Quiz />} />
-        <Route path="*" element={<PageNotFound />} />
-      </Route>
-    </Routes >
+    <>
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="about" element={<div>About</div>} />
+          <Route path="quiz" element={<Quiz />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Route>
+      </Routes >
+      <Toaster position="top-center" visibleToasts={3} />
+    </>
   )
 }
 

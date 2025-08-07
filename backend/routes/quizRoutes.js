@@ -1,7 +1,6 @@
 import express from 'express';
 
-import catchAsync from '../utils/catchAsync.js';
-import { createQuiz, getAllQuizes, updateQuiz } from '../controllers/quizController.js'
+import { createQuiz, getAllQuizes, updateQuiz, getAllQuestions } from '../controllers/quizController.js'
 
 const router = express.Router();
 
@@ -13,5 +12,9 @@ router
 router
   .route('/:id')
   .patch(updateQuiz);
+
+router
+  .route('/:id/questions')
+  .get(getAllQuestions);
 
 export default router;  
