@@ -4,6 +4,7 @@ import GlareHover from "@/blocks/Animations/GlareHover/GlareHover";
 import { useEffect, useState } from "react";
 import { QuizLoading } from "@/components/QuizLoading";
 import axios from "axios";
+import { toast } from "sonner";
 
 interface Quiz {
   id: string;
@@ -21,15 +22,16 @@ export default function QuizLayout() {
       setIsLoading(true);
       const response = await axios.get('http://localhost:3000/api/v1/quiz');
       const quizzes = response.data.data.quizzes;
-      const sanitizedQuizzes = quizzes.map(q => (
+      const sanitizedQuizzes: Quiz[] = quizzes.map((q: Quiz) => (
         {
-          id: q._id,
+          id: q.id,
           title: q.title,
           description: q.description
         }
       ));
       setQuizzes(sanitizedQuizzes);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error.message);
       setError(true);
     } finally {
       setIsLoading(false);
@@ -44,7 +46,7 @@ export default function QuizLayout() {
     <div className="flex-1 p-2 overflow-hidden">
       <ScrollArea className="h-full w-full">
         {isLoading && <QuizLoading />}
-        {!isLoading && error && <div className="h-screen w-screen flex justify-center items-center text-white font-bold text-4xl"><p>Something Went Wrong</p></div>}
+        {!isLoading && error && <div className="h-screen w-screen flex justify-center items-center text-white text-center font-bold text-4xl"><p>Something Went Wrong</p></div>}
         {!isLoading && !error && <div className="grid p-4 gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto">
           {quizzes.map((q, i) => (
             <div

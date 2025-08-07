@@ -9,7 +9,7 @@ export const createQuiz = catchAsync(async (req, res, next) => {
   const { questions } = req.body;
   const quizDetails = { title, description };
   const newQuiz = await Quiz.create(quizDetails);
-  const newQuestions = [];
+  let newQuestions = [];
   if (questions) {
     const updatedQuestions = questions.map((q) => ({ ...q, quizId: newQuiz._id }))
     newQuestions = await Question.insertMany(updatedQuestions);
@@ -58,3 +58,13 @@ export const updateQuiz = catchAsync(async (req, res, next) => {
     }
   })
 });
+
+export const getAllQuestions = catchAsync(async (req, res, next) => {
+  const quizId = req.params.id;
+
+  const questions = await Question.find({ quizId });
+  console.log(questions);
+  res.status(200).json({
+    data: questions
+  })
+})
