@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { QuizLoading } from "@/components/QuizLoading";
 import axios from "axios";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface Quiz {
   id: string;
@@ -13,9 +14,15 @@ interface Quiz {
 }
 
 export default function QuizLayout() {
+  const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+
+  const handleClick = async (quizId: string) => {
+    navigate(`quiz/${quizId}`);
+  }
 
   const fetchQuizzes = async () => {
     try {
@@ -24,11 +31,12 @@ export default function QuizLayout() {
       const quizzes = response.data.data.quizzes;
       const sanitizedQuizzes: Quiz[] = quizzes.map((q: Quiz) => (
         {
-          id: q.id,
+          id: q._id,
           title: q.title,
           description: q.description
         }
       ));
+      console.log(sanitizedQuizzes);
       setQuizzes(sanitizedQuizzes);
     } catch (error: any) {
       toast.error(error.message);
@@ -52,6 +60,7 @@ export default function QuizLayout() {
             <div
               key={i}
               className="relative w-full min-h-56 sm:min-h-60 md:min-h-64 lg:min-h-72 xl:min-h-80 transform transition duration-200 ease-in hover:scale-[1.03]"
+              onClick={() => handleClick(q.id)}
             >
               <GlareHover
                 glareColor="#ffffff"

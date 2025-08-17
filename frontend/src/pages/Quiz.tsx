@@ -1,57 +1,58 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from 'sonner';
 
-const questions = [
-  {
-    id: 5,
-    question: "Which HTML tag is used to define an unordered list?",
-    options: ["<ul>", "<ol>", "<li>", "<list>"],
-    answer: "<ul>",
-  },
-  {
-    id: 6,
-    question: "What does CSS stand for?",
-    options: [
-      "Computer Style Sheets",
-      "Cascading Style Sheets",
-      "Colorful Style Sheets",
-      "Creative Style Sheets",
-    ],
-    answer: "Cascading Style Sheets",
-  },
-  {
-    id: 7,
-    question:
-      "Which JavaScript method is used to write content into an HTML document?",
-    options: ["console.log()", "document.write()", "window.alert()", "innerHTML()"],
-    answer: "document.write()",
-  },
-  {
-    id: 8,
-    question: "In React, what is used to pass data to a component from outside?",
-    options: ["state", "props", "setState", "render"],
-    answer: "props",
-  },
-  {
-    id: 9,
-    question: "Which of the following is a backend language?",
-    options: ["JavaScript", "HTML", "Python", "CSS"],
-    answer: "Python",
-  },
-  {
-    id: 10,
-    question: "Which HTTP method is used to update a resource completely?",
-    options: ["POST", "PATCH", "PUT", "GET"],
-    answer: "PUT",
-  },
-];
+interface Question {
+  id: number,
+  question: string,
+  options: string[],
+  answer: string
+}
 
 export default function Quiz() {
+  const { quizId } = useParams();
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
   const [answered, setAnswered] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [completed, setCompleted] = useState<boolean>(false);
-  const currentQuestion = questions[questionIndex];
+  const [isLoading, setIsLoading] = useState(false);
+  const currentQuestion: Question = questions[questionIndex];
+
+  const fetchQuestions = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`http://localhost:3000/api/v1/quiz/${quizId}/questions`);
+      const questions = response.data.data;
+      if (questions.length === 0) {
+        toast.error("No questions found for this quiz!");
+        return;
+      }
+      const sanitizedQuestion = questions.map((q: any) => {
+        return {
+          id: q._id,
+          question: q.questionText,
+          options: q.options.map((o) => {
+            return o.optionText
+          }),
+          answer: q.options.filter((o) => {
+            return o.isCorrect === true;
+          })[0].optionText
+        };
+      });
+      setQuestions(sanitizedQuestion);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchQuestions();
+  }, [])
 
   const handleOptionClick = (index: number) => {
     const correctAnswer = currentQuestion.answer;
@@ -95,25 +96,35 @@ export default function Quiz() {
   }
 
   return (
-    <div className="text-white flex flex-col items-center justify-center gap-5 min-h-screen max-w-7xl mx-auto p-4">
-      <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold rounded text-center">
-        {currentQuestion.question}
-      </p>
+    <>
+      {isLoading && <div>Loading...</div>}
 
-      <ul className="mt-6 w-full max-w-xl space-y-4">
-        {currentQuestion.options.map((option, index) => (
-          <QuizOption
-            key={index}
-            index={index}
-            text={option}
-            answered={answered}
-            isCorrect={isCorrect}
-            selected={selectedOption === index}
-            onClick={handleOptionClick}
-          />
-        ))}
-      </ul>
-    </div>
+      {!isLoading && questions.length > 0 && (
+        <div className="text-white flex flex-col items-center justify-center gap-5 min-h-screen max-w-7xl mx-auto p-4">
+          <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold rounded text-center">
+            {currentQuestion.question}
+          </p>
+
+          <ul className="mt-6 w-full max-w-xl space-y-4">
+            {currentQuestion.options.map((option, index) => (
+              <QuizOption
+                key={index}
+                index={index}
+                text={option}
+                answered={answered}
+                isCorrect={isCorrect}
+                selected={selectedOption === index}
+                onClick={handleOptionClick}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {!isLoading && questions.length === 0 && (
+        <div className="text-white text-center">No questions found.</div>
+      )}
+    </>
   );
 }
 
